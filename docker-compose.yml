@@ -1,0 +1,27 @@
+services:
+  inventory:
+    build:
+      context: .
+      dockerfile: src/InventoryApi/Dockerfile
+    ports:
+      - "5080:8080"
+    environment:
+      Instance__Id: inventory-a
+      ASPNETCORE_ENVIRONMENT: Development
+
+  order-api:
+    build:
+      context: .
+      dockerfile: src/OrderApi/Dockerfile
+    ports:
+      - "5070:8080"
+    environment:
+      Inventory__BaseAddress: http://inventory:8080/
+      Inventory__TimeoutSeconds: "10"
+      Inventory__HandlerLifetimeSeconds: "120"
+      Inventory__PooledConnectionLifetimeSeconds: "120"
+      # The endpoint directory dials IP addresses. Compose service discovery is real DNS, so the simulation stays off here.
+      DnsSimulation__Enabled: "false"
+      ASPNETCORE_ENVIRONMENT: Development
+    depends_on:
+      - inventory
